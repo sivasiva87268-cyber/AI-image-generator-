@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="/static/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator - Create Stunning Art</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(0, 128, 255, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* Navbar */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00f5ff, #ff00ff, #00f5ff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientFlow 3s ease infinite;
+        }
+
+        @keyframes gradientFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #00f5ff;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00f5ff, #ff00ff);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: #ff00ff;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.15) 0%, transparent 70%);
+            top: -300px;
+            right: -300px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 0, 255, 0.15) 0%, transparent 70%);
+            bottom: -250px;
+            left: -250px;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, #00f5ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+            animation: fadeInUp 1s ease 0.2s backwards;
+            position: relative;
+            z-index: 1;
+            color: #a0d8f1;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #00f5ff, #0080ff, #ff00ff);
+            background-size: 200% 200%;
+            color: #fff;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: fadeInUp 1s ease 0.4s backwards, gradientFlow 3s ease infinite;
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+            box-shadow: 0 10px 40px rgba(0, 245, 255, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 50px rgba(255, 0, 255, 0.5);
+        }
+
+        /* Generator Section */
+        .generator-section {
+            min-height: 100vh;
+            padding: 6rem 5% 4rem;
+            display: none;
+        }
+
+        .generator-section.active {
+            display: block;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .generator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .generator-card {
+            background: rgba(15, 25, 50, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+        }
+
+        .output-card {
+            background: rgba(15, 25, 50, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 0, 255, 0.2);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #00f5ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00f5ff;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .prompt-input {
+            width: 100%;
+            padding: 1.2rem;
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 150px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .prompt-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .prompt-input:focus {
+            outline: none;
+            border-color: #00f5ff;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .select-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .select-input:focus {
+            outline: none;
+            border-color: #00f5ff;
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.2);
+        }
+
+        .select-input option {
+            background: #0f1932;
+            color: #fff;
+        }
+
+        .generate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00f5ff, #0080ff, #ff00ff);
+            background-size: 200% 200%;
+            color: #fff;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: gradientFlow 3s ease infinite;
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.3);
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 0, 255, 0.5);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-container {
+            width: 100%;
+            text-align: center;
+        }
+
+        .image-wrapper {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .generated-image {
+            max-width: 100%;
+            max-height: 500px;
+            width: auto;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 245, 255, 0.3);
+            animation: fadeIn 0.5s ease;
+            border: 2px solid rgba(0, 245, 255, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .download-btn {
+            margin-top: 1.5rem;
+            background: linear-gradient(135deg, #ff00ff, #ff0080);
+            color: #fff;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 0, 255, 0.4);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 70px;
+            height: 70px;
+            border: 6px solid rgba(0, 245, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: #00f5ff;
+            border-right-color: #ff00ff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 1.5rem;
+            color: #00f5ff;
+            font-size: 1.1rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .error-message {
+            background: rgba(255, 50, 100, 0.15);
+            border: 2px solid rgba(255, 50, 100, 0.4);
+            color: #ff6b9d;
+            padding: 1.2rem;
+            border-radius: 15px;
+            margin-top: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .placeholder-text {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1.1rem;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 3rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(0, 245, 255, 0.1);
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #00f5ff;
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00f5ff, #ff00ff);
+            transition: width 0.3s;
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        .footer-links a:hover {
+            color: #ff00ff;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .generator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .output-card {
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .generator-card, .output-card {
+                padding: 1.5rem;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .generated-image {
+                max-height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">✨ AI ImageGen</div>
+        <ul class="nav-links">
+            <li><a href="#" onclick="showHero()">Home</a></li>
+            <li><a href="#" onclick="showGenerator()">Generate</a></li>
+
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <h1>Create Stunning AI Art</h1>
+        <p class="subtitle">Transform your imagination into reality with cutting-edge AI technology</p>
+        <button class="cta-button" onclick="showGenerator()">Start Creating Now</button>
+    </section>
+
+    <!-- Generator Section -->
+    <section class="generator-section" id="generator">
+        <div class="container">
+            <div class="generator-grid">
+                <!-- Input Panel -->
+                <div class="generator-card">
+                    <h2>🎨 Create Your Art</h2>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Describe Your Vision</label>
+                        <textarea 
+                            class="prompt-input" 
+                            id="promptInput" 
+                            placeholder="A mystical forest with glowing mushrooms under a starry night sky, magical atmosphere, cinematic lighting..."
+                        ></textarea>
+                    </div>
+
+                    <div class="options-grid">
+                        <div class="input-group">
+                            <label class="input-label">Image Style</label>
+                            <select class="select-input" id="styleSelect">
+                                <option value="realistic">Realistic</option>
+                                <option value="artistic">Artistic</option>
+                                <option value="anime">Anime</option>
+                                <option value="3d">3D Render</option>
+                                <option value="oil-painting">Oil Painting</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Quality</label>
+                            <select class="select-input" id="qualitySelect">
+                                <option value="standard">Standard</option>
+                                <option value="hd">HD</option>
+                                <option value="ultra">Ultra HD</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="generate-btn" id="generateBtn" onclick="generateImage()">
+                        ✨ Generate Image
+                    </button>
+
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: rgba(255,255,255,0.5); text-align: center;">
+                        💡 Tip: Press Ctrl + Enter to generate
+                    </p>
+                </div>
+
+                <!-- Output Panel -->
+                <div class="output-card">
+                    <div class="result-container" id="resultContainer">
+                        <p class="placeholder-text">🖼️ Your generated image will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+              
+                <a href="#">Gallery</a>
+            </div>
+            <p class="copyright"> All rights reserved.&Developed with ❤️ by Giri </p>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        function showHero() {
+            document.getElementById('hero').style.display = 'flex';
+            document.getElementById('generator').classList.remove('active');
+        }
+
+        function showGenerator() {
+            document.getElementById('hero').style.display = 'none';
+            document.getElementById('generator').classList.add('active');
+        }
+
+        async function generateImage() {
+            const promptInput = document.getElementById('promptInput');
+            const generateBtn = document.getElementById('generateBtn');
+            const resultContainer = document.getElementById('resultContainer');
+            
+            const prompt = promptInput.value.trim();
+            
+            if (!prompt) {
+                resultContainer.innerHTML = '<div class="error-message">⚠️ Please enter a prompt to generate an image.</div>';
+                return;
+            }
+            
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ Generating...';
+            resultContainer.innerHTML = `
+                <div class="loading"></div>
+                <p class="loading-text">Creating your masterpiece...</p>
+            `;
+            
+            try {
+                const response = await fetch(`${API_URL}/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.image) {
+                    resultContainer.innerHTML = `
+                        <div class="image-wrapper">
+                            <img src="${data.image}" alt="Generated image" class="generated-image">
+                        </div>
+                        <button class="download-btn" onclick="downloadImage('${data.image}')">
+                            📥 Download Image
+                        </button>
+                        <p style="margin-top: 1rem; opacity: 0.7; font-size: 0.9rem;">✨ Your masterpiece is ready!</p>
+                    `;
+                } else {
+                    resultContainer.innerHTML = `
+                        <div class="error-message">
+                            ❌ Error: ${data.error || 'Failed to generate image'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultContainer.innerHTML = `
+                    <div class="error-message">
+                        ❌ Connection Error: ${error.message}<br>
+                        <small>Make sure the server is running on ${API_URL}</small>
+                    </div>
+                `;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '✨ Generate Image';
+            }
+        }
+
+        function downloadImage(imageUrl) {
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = `ai-generated-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Keyboard shortcut: Ctrl + Enter to generate
+        document.getElementById('promptInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                generateImage();
+            }
+        });
+    </script>
+</body>
+</html>
