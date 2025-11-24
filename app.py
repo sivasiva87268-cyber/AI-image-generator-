@@ -16,7 +16,7 @@ def home():
     return render_template('index.html')
         
 # Stability AI API configuration
-STABILITY_API_KEY = "sk-ByiexqyBIgkvCsCyBTAfjHggE6JrzQ1Vj4tPtsfIXtrmaolG"
+STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
 STABILITY_API_URL = "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image"
 
 @app.route('/generate', methods=['POST'])
